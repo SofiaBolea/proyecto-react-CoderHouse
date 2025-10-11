@@ -20,7 +20,7 @@ const FilterCatalogPage = () => {
   };
 
   return (
-    <div className="container">
+    <div>
       <h2 style={{ textAlign: "center", margin: "20px 0" }}>Catálogo con Filtros</h2>
       <div className="category-filters">
         <button
