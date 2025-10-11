@@ -1,17 +1,15 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import CardWidget from "./CardWidget";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
 
-  // Cierra el menú si se hace click fuera
   const cerrarMenu = () => setOpen(false);
 
   return (
     <nav className="navbar">
       <h2 className="navbar-logo">Mi E-Commerce</h2>
-
-      {/* Botón Hamburguesa - para mobile */}
       <div
         className={`hamburger ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)}
@@ -20,16 +18,18 @@ const NavBar = () => {
         <span></span>
         <span></span>
       </div>
-
-      {/* Overlay para cerrar el menú al tocar fuera */}
       {open && <div className="overlay" onClick={cerrarMenu}></div>}
-
       <ul className={`navbar-links ${open ? "active" : ""}`}>
-        <li><a href="#" >Inicio</a></li>
-        <li><a href="#" >Productos</a></li>
-        <li><a href="#" >Contacto</a></li>
+        <li>
+          <Link to="/" onClick={cerrarMenu}>Home</Link>
+        </li>
+        <li>
+          <Link to="/catalog" onClick={cerrarMenu}>Catálogo Principal</Link>
+        </li>
+        <li>
+          <Link to="/filter-catalog" onClick={cerrarMenu}>Catálogo con Filtros</Link>
+        </li>
       </ul>
-
       <CardWidget />
     </nav>
   );
