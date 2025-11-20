@@ -1,43 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import "../App.css";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../firebase/config";
+import ItemList from "./ItemList";
+import Loader from "./Loader";
 
-const ItemListContainer = ({ message, category, filterProducts }) => {
-  const [products, setProducts] = useState([]);
+export default function ItemListContainer({ categoryId, searchTerm = "" }) {
+  const [allItems, setAllItems] = useState([]);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const filterByName = (list, term) => {
+    if (!term) return list;
+    const t = term.trim().toLowerCase();
+    return list.filter(item => (item.title || "").toLowerCase().includes(t));
+  };
 
   useEffect(() => {
-    let url = "https://fakestoreapi.com/products";
-    if (category) {
-      url = `https://fakestoreapi.com/products/category/${category}`;
-    }
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => setProducts(data));
-  }, [category]);
+    let mounted = true;
+    setLoading(true);
+    const colRef = collection(db, "products");
+    const q = categoryId ? query(colRef, where("category", "==", categoryId)) : colRef;
 
-  const displayedProducts = filterProducts ? filterProducts(products) : products;
+    getDocs(q)
+      .then(snapshot => {
+        if (!mounted) return;
+        const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setAllItems(results);
+        setItems(filterByName(results, searchTerm));
+      })
+      .catch(() => {
+        if (mounted) {
+          setAllItems([]);
+          setItems([]);
+        }
+      })
+      .finally(() => mounted && setLoading(false));
 
-  return (
-    <div className="container">
-      <h1>{message}</h1>
-      <p>Explora nuestra colección exclusiva de productos.</p>
-      <div className="product-list-scroll">
-        {displayedProducts.map((product) => (
-          <Link
-            key={product.id}
-            to={`/product/${product.id}`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <div className="card">
-              <img src={product.image} alt={product.title} />
-              <h3>{product.title}</h3>
-              <p>${product.price}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-};
+    return () => { mounted = false; };
+  }, [categoryId]);
 
-export default ItemListContainer;
+  // Reaplica filtro cuando cambia searchTerm o la lista completa
+  useEffect(() => {
+    setItems(filterByName(allItems, searchTerm));
+  }, [searchTerm, allItems]);
+
+  if (loading) return <Loader />;
+  return <ItemList items={items} />;
+}

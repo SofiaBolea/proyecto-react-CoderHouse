@@ -1,38 +1,24 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import CardWidget from "./CardWidget";
+import "./navBar.css";
 
-const NavBar = () => {
-  const [open, setOpen] = useState(false);
+const activeClass = ({ isActive }) => (isActive ? "navlink active" : "navlink");
 
-  const cerrarMenu = () => setOpen(false);
-
+export default function NavBar() {
   return (
-    <nav className="navbar">
-      <h2 className="navbar-logo">Mi E-Commerce</h2>
-      <div
-        className={`hamburger ${open ? "open" : ""}`}
-        onClick={() => setOpen(!open)}
-      >
-        <span></span>
-        <span></span>
-        <span></span>
+    <header className="navbar">
+      <div className="nav-left">
+        <NavLink to="/" className="brand">MiTienda</NavLink>
+        <nav className="nav">
+          <NavLink to="/catalogo" className={activeClass}>Catálogo</NavLink>
+          <NavLink to="/categoria/calzado" className={activeClass}>Calzado</NavLink>
+          <NavLink to="/categoria/ropa" className={activeClass}>Ropa</NavLink>
+        </nav>
       </div>
-      {open && <div className="overlay" onClick={cerrarMenu}></div>}
-      <ul className={`navbar-links ${open ? "active" : ""}`}>
-        <li>
-          <Link to="/" onClick={cerrarMenu}>Home</Link>
-        </li>
-        <li>
-          <Link to="/catalog" onClick={cerrarMenu}>Catálogo Principal</Link>
-        </li>
-        <li>
-          <Link to="/filter-catalog" onClick={cerrarMenu}>Catálogo con Filtros</Link>
-        </li>
-      </ul>
-      <CardWidget />
-    </nav>
+      <div className="nav-right">
+        <CardWidget />
+      </div>
+    </header>
   );
-};
-
-export default NavBar;
+}

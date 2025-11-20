@@ -1,0 +1,6 @@
+.navbar{align-items:center}
+.brand{font-weight:700;margin-right:12px}
+.nav-right{display:flex;align-items:center;gap:8px}
+@media (max-width:480px){
+  .brand{font-size:1rem}
+}
